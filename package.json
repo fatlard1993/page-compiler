@@ -1,10 +1,10 @@
 {
 	"name": "page-compiler",
 	"version": "1.0.0",
-	"description": "",
+	"description": "A node.js utility for compiling separate page files into a single html document",
 	"main": "src/index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "ava"
 	},
 	"repository": {
 		"type": "git",
@@ -25,21 +25,22 @@
 		"extends": "rules"
 	},
 	"devDependencies": {
-		"eslint-config-rules": "github:fatlard1993/eslint-config-rules#2.x.x",
-		"babel-eslint": "^10.0.1",
-		"eslint": "^5.16.0"
+		"ava": "^2.4.0",
+		"babel-eslint": "^10.0.3",
+		"eslint": "^6.5.1",
+		"eslint-config-rules": "github:fatlard1993/eslint-config-rules#2.x.x"
 	},
 	"dependencies": {
-		"@babel/core": "^7.4.5",
-		"@babel/preset-env": "^7.4.5",
-		"autoprefixer": "^9.6.0",
+		"@babel/core": "^7.6.2",
+		"@babel/preset-env": "^7.6.2",
+		"autoprefixer": "^9.6.4",
 		"find-root": "^1.1.0",
 		"fs-extended": "github:fatlard1993/fs-extended#2.x.x",
 		"log": "github:fatlard1993/log#2.x.x",
 		"performance-now": "^2.1.0",
-		"postcss-extend-rule": "^2.0.0",
+		"postcss-extend-rule": "^3.0.0",
 		"postcss-nested": "^4.1.2",
 		"postcss-simple-vars": "^5.0.2",
-		"yargs": "^13.2.4"
+		"yargs": "^14.2.0"
 	}
 }
