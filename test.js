@@ -19,11 +19,11 @@ run('build error', (test) => {
 run('build one', (test) => {
 	var page = pageCompiler.build('one');
 
-	test.is(page.length, 234);
+	test.is(page.length, 303);
 });
 
 run('build two', (test) => {
 	var page = pageCompiler.build('two');
 
-	test.is(page.length, 199);
+	test.is(page.length, 268);
 });

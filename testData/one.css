@@ -1,3 +1,7 @@
+// includes two
+
 div {
+	@extend .extendTest;
+
 	display: none;
 }
