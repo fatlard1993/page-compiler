@@ -38,7 +38,7 @@
 		"fs-extended": "github:fatlard1993/fs-extended#2.x.x",
 		"log": "github:fatlard1993/log#2.x.x",
 		"performance-now": "^2.1.0",
-		"postcss-extend-rule": "^3.0.0",
+		"postcss-extend-rule": "^2.0.0",
 		"postcss-nested": "^4.1.2",
 		"postcss-simple-vars": "^5.0.2",
 		"yargs": "^14.2.0"
