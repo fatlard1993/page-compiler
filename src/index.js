@@ -264,11 +264,14 @@ const pageCompiler = module.exports = {
 			fileStats = /^(.*\/)?([^\.]*)\.?(.*)?$/.exec(includes[x]);
 			filePath = fileStats[1];
 			fileName = fileStats[2];
-			fileExtension = fileStats[3] || file.extension;
+			fileExtension = fileStats[3];
 
 			if(!fileName || fileName === 'undefined') continue;
 
-			includes[x] = `${filePath}${fileName}.${fileExtension}`;
+			fileName += fileExtension === file.extension ? '.'+ fileExtension : '';
+			fileExtension = fileExtension || file.extension;
+
+			includes[x] = `${filePath || ''}${fileName}.${fileExtension}`;
 
 			if(!fs.existsSync(includes[x])) includes[x] = this.findFile(fileName, fileExtension, file);
 
