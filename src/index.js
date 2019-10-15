@@ -271,9 +271,7 @@ const pageCompiler = module.exports = {
 			fileName += fileExtension === file.extension ? '.'+ fileExtension : '';
 			fileExtension = fileExtension || file.extension;
 
-			includes[x] = `${filePath || ''}${fileName}.${fileExtension}`;
-
-			if(!fs.existsSync(includes[x])) includes[x] = this.findFile(fileName, fileExtension, file);
+			includes[x] = this.findFile(fileName, fileExtension, file);
 
 			if(includes[x] && fs.existsSync(includes[x])) parsedIncludes.push(includes[x]);
 		}
@@ -300,13 +298,14 @@ const pageCompiler = module.exports = {
 
 		var fileLocation;
 		var checks = [
-			`src/${name}.${extension}`,
 			`client/${extension}/${name}.${extension}`,
+			`src/${name}.${extension}`,
 			`node_modules/${name}/src/index.${extension}`,
 			`node_modules/${name}/package.json`,
 			`client/resources/${name}.${extension}`,
 			`../node_modules/${name}/package.json`,
 			`../../node_modules/${name}/package.json`,
+			`${name}.${extension}`,
 			`testData/${name}.${extension}`
 		];
 
