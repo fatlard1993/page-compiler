@@ -80,6 +80,8 @@ const pageCompiler = module.exports = {
 		pageCompiler.cache = pageCompiler.cache || {};
 		pageCompiler.cache.postcss = pageCompiler.cache.postcss || {};
 
+		pageCompiler.rootFolder = args.root || process.env.ROOT_FOLDER || require('find-root')(__dirname);
+
 		var fileLocation = pageCompiler.findFile(name, 'html');
 		var files = pageCompiler.cacheFileAndIncludes(fileLocation);
 
@@ -337,7 +339,7 @@ const pageCompiler = module.exports = {
 			}
 		}
 
-		if(!fileLocation && !this.prebuilt[name]) log.warn(`[page-compiler] Could not find file "${name}.${extension}" for "${file && file.location}" - does not exist`);
+		if(!fileLocation && !this.prebuilt[name]) log.warn(`[page-compiler] Could not find file "${name}.${extension}" for "${file ? file.location : name}" - does not exist`);
 
 		return fileLocation || (this.prebuilt[name] ? `prebuilt/${name}.${extension}` : '');
 	}
