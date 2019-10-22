@@ -62,7 +62,7 @@ const babelOptions = {
 };
 
 const pageCompiler = module.exports = {
-	rootFolder: path.resolve(args.root || process.env.ROOT_FOLDER || require('find-root')(__dirname)),
+	rootFolder: path.resolve(args.root || process.env.ROOT_FOLDER || findRoot(__dirname)),
 	includesText: '// includes ',
 	babelText: '// babel',
 	startText: '<!DOCTYPE html>\n<html lang="en"><head>\n',
@@ -80,7 +80,7 @@ const pageCompiler = module.exports = {
 		pageCompiler.cache = pageCompiler.cache || {};
 		pageCompiler.cache.postcss = pageCompiler.cache.postcss || {};
 
-		pageCompiler.rootFolder = args.root || process.env.ROOT_FOLDER || require('find-root')(__dirname);
+		pageCompiler.rootFolder = args.root || process.env.ROOT_FOLDER || findRoot(__dirname);
 
 		var fileLocation = pageCompiler.findFile(name, 'html');
 		var files = pageCompiler.cacheFileAndIncludes(fileLocation);
