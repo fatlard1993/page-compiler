@@ -29,13 +29,17 @@
 		"babel-eslint": "^10.0.3",
 		"eslint": "^6.5.1",
 		"eslint-config-rules": "github:fatlard1993/eslint-config-rules#2.x.x"
-	},
+  },
+  "ava": {
+    "files": ["**/*.test.js"]
+  },
 	"dependencies": {
 		"@babel/core": "^7.6.2",
 		"@babel/preset-env": "^7.6.2",
 		"autoprefixer": "^9.6.4",
 		"find-root": "^1.1.0",
 		"fs-extended": "github:fatlard1993/fs-extended#2.x.x",
+		"js-util": "github:fatlard1993/js-util",
 		"log": "github:fatlard1993/log#2.x.x",
 		"performance-now": "^2.1.0",
 		"postcss-extend-rule": "^2.0.0",
