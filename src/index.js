@@ -112,7 +112,7 @@ const pageCompiler = module.exports = {
 
 		if(file.css.length && !pageCompiler.cache.postcss[fileLocation]){
 			log(`[page-compiler] Rendering ${name} css`);
-			log()(file.css);
+			log(4)(file.css);
 
 			pageCompiler.cache.postcss[fileLocation] = postcss([postcssAutoprefixer(autoprefixerOptions), postcssNesting(), postcssExtend(), postcssVariables()]).process(file.css);
 		}
