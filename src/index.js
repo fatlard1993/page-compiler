@@ -112,6 +112,7 @@ const pageCompiler = module.exports = {
 
 		if(file.css.length && !pageCompiler.cache.postcss[fileLocation]){
 			log(`[page-compiler] Rendering ${name} css`);
+			log()(file.css);
 
 			pageCompiler.cache.postcss[fileLocation] = postcss([postcssAutoprefixer(autoprefixerOptions), postcssNesting(), postcssExtend(), postcssVariables()]).process(file.css);
 		}
@@ -212,7 +213,7 @@ const pageCompiler = module.exports = {
 			this.cache[fileLocation].includes = this.getIncludes(fileText, this.cache[fileLocation]);
 
 			if(fileText && this.cache[fileLocation].extension === 'css'){
-				fileText = fileText.replace(/\/\/.*\n?/g, '');
+				fileText = fileText.replace(/\/\*([\s\S]*?)\*\/|(?=[\t\s;]{0,})\/\/.*/g, '');
 
 				for(var x = 0, keys = Object.keys(this.cache.postcss), count = keys.length; x < count; ++x){
 					if(this.cache[keys[x]].cssChildren && this.cache[keys[x]].cssChildren[fileLocation]){
@@ -326,7 +327,7 @@ const pageCompiler = module.exports = {
 				if(fileLocation.includes('package.json')){
 					var pkg = JSON.parse(fs.readFileSync(fileLocation));
 
-					fileLocation = path.resolve(filePath, checks[x].replace('package.json', ''), pkg['main'+ (extension  === 'css' ? 'Css' : '')]);
+					fileLocation = path.resolve(filePath, checks[x].replace('package.json', ''), pkg['main'+ (extension  === 'css' ? 'Css' : '')] || pkg.main || '');
 				}
 
 				break;
