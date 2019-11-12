@@ -327,7 +327,9 @@ const pageCompiler = module.exports = {
 				if(fileLocation.includes('package.json')){
 					var pkg = JSON.parse(fs.readFileSync(fileLocation));
 
-					fileLocation = path.resolve(filePath, checks[x].replace('package.json', ''), pkg['main'+ (extension  === 'css' ? 'Css' : '')] || pkg.main || '');
+					fileLocation = path.resolve(filePath, checks[x].replace('package.json', ''), pkg['main'+ (extension === 'css' ? 'Css' : '')] || pkg.main || '');
+
+					log.info(3)(`[page-compiler] Got ${fileLocation} from package.json`);
 				}
 
 				break;
