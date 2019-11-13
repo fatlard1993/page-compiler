@@ -57,8 +57,11 @@ const autoprefixerOptions = {
 	cascade: false
 };
 
-const babelOptions = {
-	presets: ['@babel/env']
+const babelOptions = { // todo make this easier to customize for one-offs
+	presets: ['@babel/env'],
+	plugins: [
+    ['@babel/plugin-proposal-class-properties', { 'loose': true }]
+  ]
 };
 
 const pageCompiler = module.exports = {
