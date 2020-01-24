@@ -122,9 +122,13 @@ const pageCompiler = module.exports = {
 
 		file.text += `${pageCompiler.startText}${pageCompiler.cache[pageCompiler.headFileLocation].text.replace('XXX', name)}`;
 
-		if(file.webmanifest) file.text += `<link rel="manifest" href='data:application/manifest+json,${JSON.stringify(JSON.parse(file.webmanifest))}'/>`;
-		if(file.js) file.text += `<script>${file.js}</script>`;
-		if(pageCompiler.cache.postcss[fileLocation]) file.text += `<style>${pageCompiler.cache.postcss[fileLocation]}</style>`;
+		if(file.webmanifest){
+			var test = JSON.stringify(JSON.parse(file.webmanifest));
+			log.warn('Possible issues with including a manifest this way: ', test);
+			file.text += `\n<link rel="manifest" href='data:application/manifest+json,${test}' />`;
+		}
+		if(file.js) file.text += `\n<script>${file.js}</script>`;
+		if(pageCompiler.cache.postcss[fileLocation]) file.text += `\n<style>${pageCompiler.cache.postcss[fileLocation]}</style>`;
 
 		file.text += `${pageCompiler.openText}${dynamicContent ? file.html.replace('YYY', dynamicContent) : file.html}${pageCompiler.closeText}`;
 
