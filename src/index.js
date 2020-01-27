@@ -336,6 +336,8 @@ const pageCompiler = module.exports = {
 
 					fileLocation = path.resolve(filePath, checks[x].replace('package.json', ''), pkg['main'+ (extension === 'css' ? 'Css' : '')] || pkg.main || '');
 
+					if(!fileLocation.endsWith(extension)) fileLocation += `.${extension}`;
+
 					log.info(3)(`[page-compiler] Got ${fileLocation} from package.json`);
 				}
 
