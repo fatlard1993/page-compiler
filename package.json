@@ -1,6 +1,6 @@
 {
 	"name": "page-compiler",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "A node.js utility for compiling separate page files into a single html document",
 	"main": "src/index.js",
 	"scripts": {
