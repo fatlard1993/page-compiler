@@ -60,8 +60,8 @@ const autoprefixerOptions = {
 const babelOptions = { // todo make this easier to customize for one-offs
 	presets: ['@babel/env'],
 	plugins: [
-    ['@babel/plugin-proposal-class-properties', { 'loose': true }]
-  ]
+		['@babel/plugin-proposal-class-properties', { 'loose': true }]
+	]
 };
 
 const pageCompiler = module.exports = {
