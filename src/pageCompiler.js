@@ -13,18 +13,6 @@ const fsExtended = require('fs-extended');
 const log = require('log');
 const util = require('js-util');
 
-const autoprefixerOptions = {
-	flexBox: 'no-2009',
-	cascade: false
-};
-
-const babelOptions = { // todo make this easier to customize for one-offs
-	presets: ['@babel/env'],
-	plugins: [
-		['@babel/plugin-proposal-class-properties', { 'loose': true }]
-	]
-};
-
 const pageCompiler = module.exports = {
 	includesText: '// includes ',
 	babelText: '// babel',
@@ -41,6 +29,22 @@ const pageCompiler = module.exports = {
 	},
 	init: function(opts){
 		pageCompiler.opts = opts;
+
+		if(!opts.babelOptions){
+			opts.babelOptions = {
+				presets: ['@babel/env'],
+				plugins: [
+					['@babel/plugin-proposal-class-properties', { 'loose': true }]
+				]
+			};
+		}
+
+		if(!opts.autoprefixerOptions){
+			opts.autoprefixerOptions = {
+				flexBox: 'no-2009',
+				cascade: false
+			};
+		}
 
 		pageCompiler.rootPath = function rootPath(){ return path.join(opts.rootFolder, ...arguments); };
 
@@ -87,7 +91,7 @@ const pageCompiler = module.exports = {
 			log(`[page-compiler] Rendering ${name} css`);
 			log(4)(file.css);
 
-			pageCompiler.cache.postcss[fileLocation] = postcss([postcssAutoprefixer(autoprefixerOptions), postcssNesting(), postcssExtend(), postcssVariables()]).process(file.css);
+			pageCompiler.cache.postcss[fileLocation] = postcss([postcssAutoprefixer(this.opts.autoprefixerOptions), postcssNesting(), postcssExtend(), postcssVariables()]).process(file.css);
 		}
 
 		file.text += `${pageCompiler.startText}${pageCompiler.cache[pageCompiler.headFileLocation].text.replace('XXX', name)}`;
@@ -207,7 +211,7 @@ const pageCompiler = module.exports = {
 				try{
 					log('[page-compiler] Running babel on JS: ', fileLocation);
 
-					fileText = babel.transformSync(fileText, babelOptions).code;
+					fileText = babel.transformSync(fileText, this.opts.babelOptions).code;
 
 					if(this.opts.overwriteWithBabel) fs.writeFileSync(fileLocation, this.cache[fileLocation].includesText +'\n'+ fileText);
 				}
