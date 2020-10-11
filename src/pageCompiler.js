@@ -50,6 +50,8 @@ const pageCompiler = module.exports = {
 		pageCompiler.cache = pageCompiler.cache || {};
 		pageCompiler.cache.postcss = pageCompiler.cache.postcss || {};
 
+		if(process.env.ROOT_FOLDER) pageCompiler.opts.rootFolder = process.env.ROOT_FOLDER;
+
 		var fileLocation = pageCompiler.findFile(name, 'html');
 		var files = pageCompiler.cacheFileAndIncludes(fileLocation);
 
