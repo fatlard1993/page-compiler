@@ -28,8 +28,6 @@ const pageCompiler = module.exports = {
 		`
 	},
 	init: function(opts){
-		pageCompiler.opts = opts;
-
 		if(!opts.babelOptions){
 			opts.babelOptions = {
 				presets: ['@babel/env'],
@@ -45,6 +43,8 @@ const pageCompiler = module.exports = {
 				cascade: false
 			};
 		}
+
+		pageCompiler.opts = opts;
 
 		pageCompiler.rootPath = function rootPath(){ return path.join(opts.rootFolder, ...arguments); };
 
