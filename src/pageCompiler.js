@@ -14,6 +14,8 @@ const log = require('log');
 const util = require('js-util');
 
 const pageCompiler = module.exports = {
+	importRegex: /import\s\S+\sfrom\s'([^']+)';?\n?/,
+	moduleExportsRegex: /^.*\b(module\.exports)\b.*$/,
 	includesText: '// includes ',
 	babelText: '// babel',
 	startText: '<!DOCTYPE html>\n<html lang="en"><head>\n',
@@ -205,7 +207,13 @@ const pageCompiler = module.exports = {
 				}
 			}
 
-			else if(this.cache[fileLocation].includes) fileText = fileText.replace(/.*\n/, '\n');
+			else if(this.cache[fileLocation].includes){
+				if(/(.*)\n?/.exec(fileText)[1].startsWith(this.includesText)) fileText = fileText.replace(/.*\n/, '\n');
+
+				fileText = fileText.replace(new RegExp(this.importRegex, 'gm'), '');
+
+				fileText = fileText.replace(new RegExp(this.moduleExportsRegex, 'gm'), '');
+			}
 
 			if(this.cache[fileLocation].extension === 'js' && /^(.*)\n?(.*)\n?/.exec(fileText)[1].startsWith(this.babelText)){
 				try{
@@ -238,11 +246,23 @@ const pageCompiler = module.exports = {
 	getIncludes: function(text, file){
 		var firstLine = /(.*)\n?/.exec(text)[1];
 
-		if(!firstLine.startsWith(this.includesText)) return;
+		file.includesText = file.includesText || '';
 
-		file.includesText = firstLine;
+		if(firstLine.startsWith(this.includesText)) file.includesText += firstLine +'\n';
 
-		var includes = firstLine.substring(12).split(' '), parsedIncludes = [];
+		if(this.importRegex.test(text)) file.includesText += /(import\s\S+\sfrom\s'([^']+)';?\n?)+/.exec(text)[0] +'\n';
+
+		var includes = firstLine.startsWith(this.includesText) ? firstLine.substring(12).split(' ') : [];
+
+		while(this.importRegex.test(text)){
+			includes.push(this.importRegex.test(text) && this.importRegex.exec(text)[1]);
+
+			text = text.replace(this.importRegex, '');
+		}
+
+		if(!includes.length) return;
+
+		var parsedIncludes = [];
 
 		for(var x = includes.length, fileStats, filePath, fileName, fileExtension; x >= 0; --x){
 			fileStats = /^(.*\/)?([^\.]*)\.?(.*)?$/.exec(includes[x]);
