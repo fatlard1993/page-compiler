@@ -14,9 +14,10 @@ const log = new (require('log'))({ tag: 'page-compiler' });
 const util = require('js-util');
 
 const pageCompiler = module.exports = {
-	importRegex: /import\s\S+\sfrom\s'([^']+)';?\n?/,
+	importRegex: /import\s*?(?:(?:\S+|{(?:\s*?\w\s*?,?\s*)+})\s*?from)?\s*?'([^']+)';?\n?/,
 	moduleExportsRegex: /^.*\b(module\.exports)\b.*$/,
-	disableBabelRegex: /^.*\b(\/\/\s?noBabel)\b.*$/,
+	enableBabelRegex: /^.*\b(enableBabel)\b.*$/gm,
+	disableBabelRegex: /^.*\b(disableBabel)\b.*$/gm,
 	includesText: '// includes ',
 	babelText: '// babel',
 	startText: '<!DOCTYPE html>\n<html lang="en"><head>\n',
@@ -216,7 +217,7 @@ const pageCompiler = module.exports = {
 				fileText = fileText.replace(new RegExp(this.moduleExportsRegex, 'gm'), '');
 			}
 
-			if(this.cache[fileLocation].extension === 'js' && !this.disableBabelRegex.test(fileText)){
+			if(this.cache[fileLocation].extension === 'js' && (!fileLocation.includes('node_modules') || this.enableBabelRegex.test(fileText)) && !this.disableBabelRegex.test(fileText)){
 				try{
 					log('[page-compiler] Running babel on JS: ', fileLocation);
 

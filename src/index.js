@@ -36,6 +36,6 @@ var opts = Object.assign({ args: util.clone(args), rootFolder }, args, { verbosi
 
 const log = new (require('log'))({ color: opts.color, verbosity: opts.verbosity, tag: 'page-compiler' });
 
-log(1)('[page-compiler] Options: ', opts);
+log(1)('Options: ', opts);
 
 module.exports = (require('./pageCompiler')).init(opts);
