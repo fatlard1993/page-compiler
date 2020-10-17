@@ -43,7 +43,7 @@
 		"find-root": "^1.1.0",
 		"fs-extended": "github:fatlard1993/fs-extended#2.x.x",
 		"js-util": "github:fatlard1993/js-util",
-		"log": "github:fatlard1993/log#2.x.x",
+		"log": "github:fatlard1993/log#3.x.x",
 		"performance-now": "^2.1.0",
 		"postcss-extend-rule": "^2.0.0",
 		"postcss-nested": "^4.1.2",

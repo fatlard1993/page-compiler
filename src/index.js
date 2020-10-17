@@ -34,16 +34,8 @@ var args = yargs.argv;
 
 var opts = Object.assign({ args: util.clone(args), rootFolder }, args, { verbosity: Number(args.verbosity) });
 
-//log args polyfill
-process.env.DBG = opts.verbosity;
-process.env.COLOR = opts.version || opts.color;
-
-const log = require('log');
+const log = new (require('log'))({ color: opts.color, verbosity: opts.verbosity, tag: 'page-compiler' });
 
 log(1)('[page-compiler] Options: ', opts);
 
-const pageCompiler = require('./pageCompiler');
-
-pageCompiler.init(opts);
-
-module.exports = pageCompiler;
+module.exports = (require('./pageCompiler')).init(opts);

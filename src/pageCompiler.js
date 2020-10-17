@@ -10,7 +10,7 @@ const postcssExtend = require('postcss-extend-rule');
 const postcssVariables = require('postcss-simple-vars');
 const findRoot = require('find-root');
 const fsExtended = require('fs-extended');
-const log = require('log');
+const log = new (require('log'))({ tag: 'page-compiler' });
 const util = require('js-util');
 
 const pageCompiler = module.exports = {
