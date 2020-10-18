@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+if(require.main !== module) return (module.exports = require('./pageCompiler'));
+
 const util = require('js-util');
 const yargs = require('yargs');
 const rootFolder = require('find-root')(__dirname);
@@ -34,8 +36,8 @@ var args = yargs.argv;
 
 var opts = Object.assign({ args: util.clone(args), rootFolder }, args, { verbosity: Number(args.verbosity) });
 
-const log = new (require('log'))({ color: opts.color, verbosity: opts.verbosity, tag: 'page-compiler' });
+const log = new (require('log'))({ tag: 'page-compiler', color: opts.color, verbosity: opts.verbosity });
 
 log(1)('Options: ', opts);
 
-module.exports = (require('./pageCompiler')).init(opts);
+require('./pageCompiler').init(opts);

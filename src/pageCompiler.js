@@ -31,7 +31,7 @@ const pageCompiler = module.exports = {
 			<button onClick="window.location.href = '/'">Back</button>
 		`
 	},
-	init: function(opts){
+	init: function(opts = {}){
 		if(!opts.babelOptions){
 			opts.babelOptions = {
 				presets: ['@babel/env'],
@@ -55,7 +55,7 @@ const pageCompiler = module.exports = {
 		return pageCompiler;
 	},
 	setOptions: function(opts){
-		return pageCompiler.init(Object.assign(pageCompiler.opts, opts));
+		return pageCompiler.init(Object.assign(pageCompiler.opts || {}, opts));
 	},
 	build: function(name, dynamicContent){
 		pageCompiler.cache = pageCompiler.cache || {};
