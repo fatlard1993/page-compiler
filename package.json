@@ -25,9 +25,9 @@
 		"extends": "rules"
 	},
 	"devDependencies": {
-		"ava": "^2.4.0",
-		"babel-eslint": "^10.0.3",
-		"eslint": "^6.5.1",
+		"ava": "^3.13.0",
+		"babel-eslint": "^10.1.0",
+		"eslint": "^7.11.0",
 		"eslint-config-rules": "github:fatlard1993/eslint-config-rules#2.x.x"
 	},
 	"ava": {
@@ -36,18 +36,19 @@
 		]
 	},
 	"dependencies": {
-		"@babel/core": "^7.6.2",
-		"@babel/plugin-proposal-class-properties": "^7.7.0",
-		"@babel/preset-env": "^7.6.2",
-		"autoprefixer": "^9.6.4",
+		"@babel/core": "^7.12.3",
+		"@babel/plugin-proposal-class-properties": "^7.12.1",
+		"@babel/preset-env": "^7.12.1",
+		"autoprefixer": "^10.0.1",
 		"find-root": "^1.1.0",
 		"fs-extended": "github:fatlard1993/fs-extended#2.x.x",
 		"js-util": "github:fatlard1993/js-util",
 		"log": "github:fatlard1993/log#3.x.x",
 		"performance-now": "^2.1.0",
-		"postcss-extend-rule": "^2.0.0",
-		"postcss-nested": "^4.1.2",
-		"postcss-simple-vars": "^5.0.2",
-		"yargs": "^14.2.0"
+		"postcss": "^8.1.2",
+		"postcss-extend-rule": "^3.0.0",
+		"postcss-nested": "^5.0.1",
+		"postcss-simple-vars": "^6.0.1",
+		"yargs": "^16.1.0"
 	}
 }
