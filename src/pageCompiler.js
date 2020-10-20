@@ -34,9 +34,10 @@ const pageCompiler = module.exports = {
 	init: function(opts = {}){
 		if(!opts.babelOptions){
 			opts.babelOptions = {
+				cwd: findRoot(__filename),
 				presets: ['@babel/env'],
 				plugins: [
-					['@babel/plugin-proposal-class-properties', { 'loose': true }]
+					['@babel/plugin-proposal-class-properties']
 				]
 			};
 		}
