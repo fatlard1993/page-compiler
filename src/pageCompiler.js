@@ -4,10 +4,13 @@ const fs = require('fs');
 
 const babel = require('@babel/core');
 const postcss = require('postcss');
+const postcssMixins = require('postcss-mixins');
+const postcssDarkThemeClass = require('postcss-dark-theme-class');
+// const postcssPresetEnv = require('postcss-preset-env');
+const postcssNested = require('postcss-nested');
+// const postcssExtend = require('postcss-extend-rule');
+const postcssSimpleVars = require('postcss-simple-vars');
 const postcssAutoprefixer = require('autoprefixer');
-const postcssNesting = require('postcss-nested');
-const postcssExtend = require('postcss-extend-rule');
-const postcssVariables = require('postcss-simple-vars');
 const findRoot = require('find-root');
 const fsExtended = require('fs-extended');
 const log = new (require('log'))({ tag: 'page-compiler' });
@@ -18,6 +21,7 @@ const pageCompiler = module.exports = {
 	moduleExportsRegex: /^.*\b(module\.exports)\b.*$/,
 	enableBabelRegex: /^.*\b(enableBabel)\b.*$/gm,
 	disableBabelRegex: /^.*\b(disableBabel)\b.*$/gm,
+	includesRegex: /^.*\b(disableBabel)\b.*$/gm,
 	includesText: '// includes ',
 	babelText: '// babel',
 	startText: '<!DOCTYPE html>\n<html lang="en"><head>\n',
@@ -42,16 +46,22 @@ const pageCompiler = module.exports = {
 			};
 		}
 
-		if(!opts.autoprefixerOptions){
-			opts.autoprefixerOptions = {
-				flexBox: 'no-2009',
-				cascade: false
-			};
+		if(!opts.postcssPlugins){
+			opts.postcssPlugins = [
+				postcssMixins(),
+				postcssSimpleVars(),
+				postcssNested(),
+				postcssDarkThemeClass(),
+				postcssAutoprefixer({
+					flexBox: 'no-2009',
+					cascade: false
+				})
+			];
 		}
 
 		pageCompiler.opts = opts;
 
-		pageCompiler.rootPath = function rootPath(){ return path.join(opts.rootFolder, ...arguments); };
+		pageCompiler.rootPath = function rootPath(){ return path.join(pageCompiler.opts.rootFolder, ...arguments); };
 
 		return pageCompiler;
 	},
@@ -96,7 +106,7 @@ const pageCompiler = module.exports = {
 			log(`Rendering ${name} css`);
 			log(4)(file.css);
 
-			pageCompiler.cache.postcss[fileLocation] = postcss([postcssAutoprefixer(this.opts.autoprefixerOptions), postcssNesting(), postcssExtend(), postcssVariables()]).process(file.css);
+			pageCompiler.cache.postcss[fileLocation] = postcss(pageCompiler.opts.postcssPlugins).process(file.css);
 		}
 
 		file.text += `${pageCompiler.startText}${pageCompiler.cache[pageCompiler.headFileLocation].text.replace('XXX', name)}`;
@@ -308,9 +318,14 @@ const pageCompiler = module.exports = {
 			`client/${extension}/${name}.${extension}`,
 			`src/${name}.${extension}`,
 			`node_modules/${name}/src/index.${extension}`,
+			`node_modules/${name}/${extension}/${name}.${extension}`,
 			`node_modules/${name}/package.json`,
 			`client/resources/${name}.${extension}`,
+			`../node_modules/${name}/src/index.${extension}`,
+			`../node_modules/${name}/${extension}/${name}.${extension}`,
 			`../node_modules/${name}/package.json`,
+			`../../node_modules/${name}/src/index.${extension}`,
+			`../../node_modules/${name}/${extension}/${name}.${extension}`,
 			`../../node_modules/${name}/package.json`,
 			`${name}.${extension}`,
 			`testData/${name}.${extension}`
@@ -320,7 +335,7 @@ const pageCompiler = module.exports = {
 			fileLocation = path.resolve(filePath, checks[x]);
 
 			if(file && fileLocation === file.location){
-				log(1)(`Skipping include ${fileLocation} ... Same as source`);
+				log(1)(`Skipping include ${fileLocation} .. Same as source`);
 
 				continue;
 			}
@@ -348,7 +363,7 @@ const pageCompiler = module.exports = {
 			}
 		}
 
-		if(!fileLocation && !this.prebuilt[name]) log.warn(`Could not find file "${name}.${extension}" for "${file ? file.location : name}" - does not exist`);
+		if(!fileLocation && !this.prebuilt[name]) log.warn(`Could not find "${name}.${extension}" to include in "${file ? file.location : name}" - does not exist`);
 
 		return fileLocation || (this.prebuilt[name] ? `prebuilt/${name}.${extension}` : '');
 	}
