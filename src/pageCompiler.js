@@ -283,10 +283,9 @@ const pageCompiler = module.exports = {
 
 			if(!fileName || fileName === 'undefined') continue;
 
-			fileName += fileExtension === file.extension ? '.'+ fileExtension : '';
 			fileExtension = fileExtension || file.extension;
 
-			includes[x] = this.findFile(fileName, fileExtension, file);
+			includes[x] = this.findFile(fileName, fileExtension, file, filePath && filePath.replace(/^\/|\/$/g, ''));
 
 			if(includes[x] && fs.existsSync(includes[x])) parsedIncludes.push(includes[x]);
 		}
@@ -295,7 +294,7 @@ const pageCompiler = module.exports = {
 
 		return parsedIncludes;
 	},
-	findFile: function(name, extension, file){
+	findFile: function(name, extension, file, location){
 		var filePath;
 
 		if(file && file.path){
@@ -312,7 +311,10 @@ const pageCompiler = module.exports = {
 		log(3)(`Finding file: "${name}.${extension}" from: ${filePath}`);
 
 		var fileLocation;
-		var checks = [
+		var checks = location ? [
+			`${location}/${name}.${extension}`,
+			`node_modules/${location}/${name}.${extension}`,
+		] : [
 			`client/${extension}/${name}.${extension}`,
 			`src/${name}.${extension}`,
 			`node_modules/${name}/src/index.${extension}`,
