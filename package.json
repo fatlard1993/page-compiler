@@ -42,7 +42,7 @@
 		"autoprefixer": "^10.0.1",
 		"find-root": "^1.1.0",
 		"fs-extended": "github:fatlard1993/fs-extended#2.x.x",
-		"js-util": "github:fatlard1993/js-util",
+		"js-util": "github:fatlard1993/js-util#2.x.x",
 		"log": "github:fatlard1993/log#3.x.x",
 		"performance-now": "^2.1.0",
 		"postcss": "^8.1.3",
