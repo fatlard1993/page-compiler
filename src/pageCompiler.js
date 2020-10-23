@@ -314,6 +314,8 @@ const pageCompiler = module.exports = {
 		var checks = location ? [
 			`${location}/${name}.${extension}`,
 			`node_modules/${location}/${name}.${extension}`,
+			`../node_modules/${location}/${name}.${extension}`,
+			`../../node_modules/${location}/${name}.${extension}`,
 		] : [
 			`client/${extension}/${name}.${extension}`,
 			`src/${name}.${extension}`,
