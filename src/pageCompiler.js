@@ -308,7 +308,7 @@ const pageCompiler = module.exports = {
 
 		if(!filePath) filePath = this.opts.rootFolder;
 
-		log(3)(`Finding file: "${name}.${extension}" from: ${filePath}`);
+		log(1)(`Finding file: "${name}.${extension}" from: ${filePath}`);
 
 		var fileLocation;
 		var checks = location ? [
@@ -359,7 +359,7 @@ const pageCompiler = module.exports = {
 			}
 
 			else{
-				log.warn(3)(`${fileLocation} does not exist`);
+				log.warn(2)(`${fileLocation} does not exist`);
 
 				fileLocation = null;
 			}
