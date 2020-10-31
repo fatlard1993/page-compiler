@@ -14,20 +14,28 @@ const fsExtended = require('fs-extended');
 const log = new (require('log'))({ tag: 'page-compiler' });
 const util = require('js-util');
 
+const { StringAwareRegExp, CommentRegExp, StatementRegExp } = require('./stringAwareRegExp');
+
 const pageCompiler = module.exports = {
-	importRegex: /import\s*?(?:(?:\S+|{(?:\s*?\w\s*?,?\s*)+})\s*?from)?\s*?'([^']+)';?\n?/,
-	moduleExportsRegex: /^.*\b(module\.exports)\b.*$/,
-	enableBabelRegex: /^.*\b(enableBabel)\b.*$/gm,
-	disableBabelRegex: /^.*\b(disableBabel)\b.*$/gm,
-	includesRegex: /^.*\b(disableBabel)\b.*$/gm,
-	includesText: '// includes ',
-	babelText: '// babel',
+	fileRegex: /^(\/?.+\/)?(.+)(?:\.(.+))$/,
+	moduleExportsRegex: /module\.exports\s*=\s*|^\s*module\.exports.*$/gm,
+	allCommentsRegex: new CommentRegExp(/[\s\S]*?/, 'gm'),
+	enableBabelRegex: new CommentRegExp(/enable-?_?\s?babel/, 'gmi'),
+	disableBabelRegex: new CommentRegExp(/disable-?_?\s?babel/, 'gmi'),
+	includeRegex: new CommentRegExp(/(?:includes?|imports?|requires?)\s+(.+?)/, 'gm'),
+	importRegex: new StatementRegExp(/import\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+})\s+from)?\s*['"`](.+?)['"`]/, 'gm'),
+	requireRegex: new StatementRegExp(/(?:var|let|const)\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+}))\s*=\s*require\s*\(\s*['"`](.+?)['"`]\s*\)/, 'gm'),
+	atImportRegex: new StatementRegExp(/@import\s*['"`](.+?)['"`]/, 'gm'),
+	importSeparatorRegex: /['"`]\s*,\s*['"`]|\s*,\s*|\s+/g,
 	startText: '<!DOCTYPE html>\n<html lang="en"><head>\n',
 	openText: '\n</head><body>\n',
 	closeText: '\n</body></html>',
 	prebuilt: {
-		head: '\t<title>XXX</title>',
-		error: `// includes error.js error.css
+		'htmlOpen.html': '<!DOCTYPE html>\n<html lang="en"><head>\n',
+		'head.html': '\t<title>XXX</title>',
+		'bodyOpen.html': '\n</head><body>\n',
+		'htmlClose.html': '\n</body></html>',
+		'error.html': `// includes error.js error.css
 			<p>Server says...</p>
 			<pre>YYY</pre>
 			<button onClick="window.location.href = '/'">Back</button>
@@ -107,7 +115,7 @@ const pageCompiler = module.exports = {
 			pageCompiler.cache.postcss[fileLocation] = postcss(pageCompiler.opts.postcssPlugins).process(file.css);
 		}
 
-		file.text += `${pageCompiler.startText}${pageCompiler.cache[pageCompiler.headFileLocation].text.replace('XXX', name)}`;
+		file.text += `${pageCompiler.startText}${pageCompiler.cache[pageCompiler.headFileLocation].text.replace(/XXX/gm, name)}`;
 
 		if(file.webmanifest){
 			var test = JSON.stringify(JSON.parse(file.webmanifest));
@@ -117,9 +125,21 @@ const pageCompiler = module.exports = {
 		if(file.js) file.text += `\n<script>${file.js}</script>`;
 		if(pageCompiler.cache.postcss[fileLocation]) file.text += `\n<style>${pageCompiler.cache.postcss[fileLocation]}</style>`;
 
-		file.text += `${pageCompiler.openText}${dynamicContent ? file.html.replace('YYY', dynamicContent) : file.html}${pageCompiler.closeText}`;
+		if(dynamicContent){
+			if(typeof dynamicContent === 'object'){
+				const dynamicReplacements = Object.keys(dynamicContent);
 
-		//todo cache entire file text and invalidate on any includes changes
+				dynamicReplacements.forEach((replacement) => {
+					const args = dynamicContent[replacement], argsIsArray = regexArgs instanceof Array, regex = argsIsArray ? args[0] : args, flags = argsIsArray ? args[1] : 'gm';
+
+					file.html = file.html.replace(new RegExp(regex, flags), replacement);
+				});
+			}
+
+			else file.html = file.html.replace(/YYY/gm, dynamicContent);
+		}
+
+		file.text += `${pageCompiler.openText}${file.html}${pageCompiler.closeText}`;
 
 		return file.text;
 	},
@@ -186,29 +206,37 @@ const pageCompiler = module.exports = {
 
 			this.cache[fileLocation] = this.cache[fileLocation] || {};
 
-			var fileStats = /^(.*\/)?([^\.]*)\.?(.*)?$/.exec(fileLocation);
+			var fileStats = this.fileRegex.exec(fileLocation);
 			var fileText = fsExtended.catSync(fileLocation);
 
 			this.cache[fileLocation].location = fileLocation;
-			this.cache[fileLocation].path = fileStats[1];
-			this.cache[fileLocation].name = fileStats[2];
-			this.cache[fileLocation].extension = fileStats[3];
+			this.cache[fileLocation].path = fileStats ? fileStats[1] : '';
+			this.cache[fileLocation].name = fileStats ? fileStats[2] : fileLocation;
+			this.cache[fileLocation].extension = fileStats ? fileStats[3] : '';
 
 			if(!fileText){
 				mtime = 'no file';
 
 				fileText = this.prebuilt[this.cache[fileLocation].name] || '';
 
-				if(!fileText) log.warn(`Could not include prebuilt "${fileLocation}", does not exist`);
+				if(!fileText) return log.warn(`Could not include prebuilt "${fileLocation}", does not exist`);
 			}
 
 			else this.cache[fileLocation].mtime = String(fs.statSync(fileLocation).mtime);
 
-			this.cache[fileLocation].includes = this.getIncludes(fileText, this.cache[fileLocation]);
+			const runBabel = (!fileLocation.includes('node_modules') || this.enableBabelRegex.test(fileText)) && !this.disableBabelRegex.test(fileText);
 
-			if(fileText && this.cache[fileLocation].extension === 'css'){
-				fileText = fileText.replace(/\/\*([\s\S]*?)\*\/|(?=[\t\s;]{0,})\/\/.*/g, '');
+			fileText = fileText.replace(this.moduleExportsRegex, '');
+			fileText = this.enableBabelRegex.stringReplace(fileText);
+			fileText = this.disableBabelRegex.stringReplace(fileText);
 
+			this.cache[fileLocation].text = fileText;
+
+			this.parseIncludes(this.cache[fileLocation]);
+
+			this.cache[fileLocation].text = this.allCommentsRegex.stringReplace(this.cache[fileLocation].text);
+
+			if(this.cache[fileLocation].extension === 'css'){
 				for(var x = 0, keys = Object.keys(this.cache.postcss), count = keys.length; x < count; ++x){
 					if(this.cache[keys[x]].cssChildren && this.cache[keys[x]].cssChildren[fileLocation]){
 						log.warn(2)(`Invalidating ${keys[x]} postcss cache for ${fileLocation}`);
@@ -218,31 +246,19 @@ const pageCompiler = module.exports = {
 				}
 			}
 
-			else if(this.cache[fileLocation].includes){
-				if(/(.*)\n?/.exec(fileText)[1].startsWith(this.includesText)) fileText = fileText.replace(/.*\n/, '\n');
-
-				fileText = fileText.replace(new RegExp(this.importRegex, 'gm'), '');
-
-				fileText = fileText.replace(new RegExp(this.moduleExportsRegex, 'gm'), '');
-			}
-
-			if(this.cache[fileLocation].extension === 'js' && (!fileLocation.includes('node_modules') || this.enableBabelRegex.test(fileText)) && !this.disableBabelRegex.test(fileText)){
+			else if(this.cache[fileLocation].extension === 'js' && runBabel){
 				try{
 					log('Running babel on JS: ', fileLocation);
 
-					fileText = babel.transformSync(fileText, this.opts.babelOptions).code;
+					this.cache[fileLocation].text = babel.transformSync(this.cache[fileLocation].text, this.opts.babelOptions).code;
 
-					if(this.opts.overwriteWithBabel) fs.writeFileSync(fileLocation, this.cache[fileLocation].includesText +'\n'+ fileText);
+					if(this.opts.overwriteWithBabel) fs.writeFileSync(fileLocation, `${this.cache[fileLocation].includesText}\n${this.cache[fileLocation].text}`);
 				}
 
 				catch(err){
-					log.error('Error running babel on JS: ', fileLocation, err);
-
-					fileText = err;
+					log.error('Error running babel on JS: ', file, err);
 				}
 			}
-
-			this.cache[fileLocation].text = fileText;
 
 			log(2)(`Cached ${fileLocation}`);
 		}
@@ -254,52 +270,55 @@ const pageCompiler = module.exports = {
 			this.cache[parentName].cssChildren[fileLocation] = 1;
 		}
 	},
-	getIncludes: function(text, file){
-		var firstLine = /(.*)\n?/.exec(text)[1];
+	parseIncludes: function(file){
+		let includes = {};
 
-		file.includesText = file.includesText || '';
+		file.includesText = '';
 
-		if(firstLine.startsWith(this.includesText)) file.includesText += firstLine +'\n';
+		function stripIncludes(regex){
+			[...file.text.matchAll(regex)].forEach((includesMatch) => {
+				if(includesMatch[1] === undefined) return log(4)('Skipping string while stripping includes: ', includesMatch[0]);
 
-		if(this.importRegex.test(text)) file.includesText += /(import\s\S+\sfrom\s'([^']+)';?\n?)+/.exec(text)[0] +'\n';
+				file.includesText += includesMatch[0];
 
-		var includes = firstLine.startsWith(this.includesText) ? firstLine.substring(12).split(' ') : [];
+				(includesMatch[2] || includesMatch[3]).split(pageCompiler.importSeparatorRegex).forEach((item) => { includes[item] = true; });
 
-		while(this.importRegex.test(text)){
-			includes.push(this.importRegex.test(text) && this.importRegex.exec(text)[1]);
-
-			text = text.replace(this.importRegex, '');
+				file.text = regex.stringReplace ? regex.stringReplace(file.text) : file.text.replace(regex, '');
+			});
 		}
+
+		[this.atImportRegex, this.importRegex, this.requireRegex, this.includeRegex].forEach(stripIncludes);
+
+		includes = Object.keys(includes);
 
 		if(!includes.length) return;
 
+		log(1)('Requested includes: ', includes);
+
 		var parsedIncludes = [];
 
-		for(var x = includes.length, fileStats, filePath, fileName, fileExtension; x >= 0; --x){
-			fileStats = /^(.*\/)?([^\.]*)\.?(.*)?$/.exec(includes[x]);
-			filePath = fileStats[1];
-			fileName = fileStats[2];
-			fileExtension = fileStats[3];
+		for(var x = includes.length - 1, fileStats, filePath, fileName, fileExtension; x >= 0; --x){
+			fileStats = this.fileRegex.exec(includes[x]);
 
-			if(!fileName || fileName === 'undefined') continue;
+			filePath = fileStats && fileStats[1] && fileStats[1].replace(/^\/|\/$/g, '');
+			fileName = fileStats ? fileStats[2] : includes[x];
+			fileExtension = fileStats && fileStats[3] ? fileStats[3] : file.extension;
 
-			fileExtension = fileExtension || file.extension;
-
-			includes[x] = this.findFile(fileName, fileExtension, file, filePath && filePath.replace(/^\/|\/$/g, ''));
+			includes[x] = this.findFile(fileName, fileExtension, file, filePath);
 
 			if(includes[x] && fs.existsSync(includes[x])) parsedIncludes.push(includes[x]);
 		}
 
 		log(1)(`Parsed includes for ${file.name}.${file.extension}`, parsedIncludes);
 
-		return parsedIncludes;
+		file.includes = parsedIncludes;
 	},
-	findFile: function(name, extension, file, location){
+	findFile: function(name, extension, parentFile, location){
 		var filePath;
 
-		if(file && file.path){
+		if(parentFile && parentFile.path){
 			try{
-				filePath = findRoot(file.path);
+				filePath = findRoot(parentFile.path);
 			}
 			catch(err){
 				log.warn(err);
@@ -336,7 +355,7 @@ const pageCompiler = module.exports = {
 		for(var x = 0, count = checks.length; x < count; ++x){
 			fileLocation = path.resolve(filePath, checks[x]);
 
-			if(file && fileLocation === file.location){
+			if(parentFile && fileLocation === parentFile.location){
 				log(1)(`Skipping include ${fileLocation} .. Same as source`);
 
 				continue;
@@ -365,7 +384,7 @@ const pageCompiler = module.exports = {
 			}
 		}
 
-		if(!fileLocation && !this.prebuilt[name]) log.warn(`Could not find "${name}.${extension}" to include in "${file ? file.location : name}" - does not exist`);
+		if(!fileLocation && !this.prebuilt[name]) log.warn(`Could not find "${name}.${extension}" to include in "${parentFile ? parentFile.location : name}" - does not exist`);
 
 		return fileLocation || (this.prebuilt[name] ? `prebuilt/${name}.${extension}` : '');
 	}
