@@ -22,7 +22,7 @@ const pageCompiler = module.exports = {
 	allCommentsRegex: new CommentRegExp(/[\s\S]*?/, 'gm'),
 	enableBabelRegex: new CommentRegExp(/enable-?_?\s?babel/, 'gmi'),
 	disableBabelRegex: new CommentRegExp(/disable-?_?\s?babel/, 'gmi'),
-	includeRegex: new CommentRegExp(/(?:includes?|imports?|requires?)\s+(.+?)/, 'gm'),
+	includeRegex: new CommentRegExp(/\s*(?:includes?|imports?|requires?)\s+(.+?)/, 'gm'),
 	importRegex: new StatementRegExp(/import\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+})\s+from)?\s*['"`](.+?)['"`]/, 'gm'),
 	requireRegex: new StatementRegExp(/(?:var|let|const)\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+}))\s*=\s*require\s*\(\s*['"`](.+?)['"`]\s*\)/, 'gm'),
 	atImportRegex: new StatementRegExp(/@import\s*['"`](.+?)['"`]/, 'gm'),
@@ -277,7 +277,9 @@ const pageCompiler = module.exports = {
 
 		function stripIncludes(regex){
 			[...file.text.matchAll(regex)].forEach((includesMatch) => {
-				if(includesMatch[1] === undefined) return log(4)('Skipping string while stripping includes: ', includesMatch[0]);
+				if(includesMatch[1] === undefined) return log(4)(`Skipping ${includesMatch[0][0] === '/' ? 'regex' : 'string'} while stripping includes: ${includesMatch[0]}`);
+
+				log.info(1)(`Found includes statement: ${includesMatch[0]}`);
 
 				file.includesText += includesMatch[0];
 
