@@ -17,7 +17,7 @@ class StringAwareRegExp extends RegExp {
 StringAwareRegExp.prototype.regExpToInnerRegexString = function(regExp){ return regExp.toString().replace(/^\/|\/[gimsuy]*$/g, ''); };
 Object.defineProperty(StringAwareRegExp.prototype, 'disqualifyStringsRegExp', {
 	get: function(){
-		return StringAwareRegExp.prototype.regExpToInnerRegexString(/\/\s*[^\/\*]+\/|\\"|"(?:\\"|[^"])*"|\\'|'(?:\\'|[^'])*'|\\`|`(?:\\`|[^`])*`|/);
+		return StringAwareRegExp.prototype.regExpToInnerRegexString(/\\\/|\/\s*(?:\\\/|[^\/\*\n])+\/|\\"|"(?:\\"|[^"])*"|\\'|'(?:\\'|[^'])*'|\\`|`(?:\\`|[^`])*`|/);
 	}
 });
 
