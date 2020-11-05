@@ -18,7 +18,7 @@ const { StringAwareRegExp, CommentRegExp, StatementRegExp } = require('./stringA
 
 const pageCompiler = module.exports = {
 	fileRegex: /^(\/?.+\/)?(.+)(?:\.(.+))$/,
-	moduleExportsRegex: /module\.exports\s*=\s*|^\s*module\.exports.*$/gm,
+	moduleExportsRegex: /^\s*module\.exports.*$|module\.exports\s*=\s*/gm,
 	allCommentsRegex: new CommentRegExp(/[\s\S]*?/, 'gm'),
 	enableBabelRegex: new CommentRegExp(/enable-?_?\s?babel/, 'gmi'),
 	disableBabelRegex: new CommentRegExp(/disable-?_?\s?babel/, 'gmi'),
