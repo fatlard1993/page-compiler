@@ -25,7 +25,7 @@ class CommentRegExp extends StringAwareRegExp {
 	constructor(regex, flags){
 		if(regex instanceof RegExp) regex = StringAwareRegExp.prototype.regExpToInnerRegexString(regex);
 
-		return super(`\\/\\/\\s*${regex}$|(?:<!--|\\/\\s*\\*)\\s*${regex}\\s*(?:-->|\\*\\s*\\/)`, flags);
+		return super(`\\/\\/${regex}$|(?:<!--|\\/\\s*\\*)\\s*${regex}\\s*(?:-->|\\*\\s*\\/)`, flags);
 	}
 }
 
