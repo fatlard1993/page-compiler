@@ -16,6 +16,8 @@ const util = require('js-util');
 
 const { StringAwareRegExp, CommentRegExp, StatementRegExp } = require('./stringAwareRegExp');
 
+require('string.prototype.matchall').shim();
+
 const pageCompiler = module.exports = {
 	fileRegex: /^(\/?.+\/)?(.+)(?:\.(.+))$/,
 	moduleExportsRegex: /^\s*module\.exports.*$|module\.exports\s*=\s*/gm,
@@ -278,7 +280,7 @@ const pageCompiler = module.exports = {
 		file.includesText = '';
 
 		function stripIncludes(regex){
-			if(!file.text.matchAll) return;
+			if(!regex.test(file.text) || !(file.text.matchAll && file.text.matchAll(regex))) return log.error()('skipping regex', regex);
 
 			[...file.text.matchAll(regex)].forEach((includesMatch) => {
 				if(includesMatch[1] === undefined) return log(4)(`Skipping ${includesMatch[0][0] === '/' ? 'regex' : 'string'} while stripping includes: ${includesMatch[0]}`);

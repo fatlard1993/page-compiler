@@ -50,6 +50,7 @@
 		"postcss-mixins": "^7.0.1",
 		"postcss-nested": "^5.0.1",
 		"postcss-simple-vars": "^6.0.1",
+		"string.prototype.matchall": "^4.0.2",
 		"yargs": "^16.1.0"
 	}
 }
