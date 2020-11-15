@@ -271,11 +271,15 @@ const pageCompiler = module.exports = {
 		}
 	},
 	parseIncludes: function(file){
+		if(!file.text) return;
+
 		let includes = {};
 
 		file.includesText = '';
 
 		function stripIncludes(regex){
+			if(!file.text.matchAll) return;
+
 			[...file.text.matchAll(regex)].forEach((includesMatch) => {
 				if(includesMatch[1] === undefined) return log(4)(`Skipping ${includesMatch[0][0] === '/' ? 'regex' : 'string'} while stripping includes: ${includesMatch[0]}`);
 
