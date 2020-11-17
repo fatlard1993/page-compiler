@@ -279,9 +279,7 @@ const pageCompiler = module.exports = {
 
 		file.includesText = '';
 
-		function stripIncludes(regex){
-			if(!regex.test(file.text) || !(file.text.matchAll && file.text.matchAll(regex))) return log.error()('skipping regex', regex);
-
+		[this.atImportRegex, this.importRegex, this.requireRegex, this.includeRegex].forEach((regex) => {
 			[...file.text.matchAll(regex)].forEach((includesMatch) => {
 				if(includesMatch[1] === undefined) return log(4)(`Skipping ${includesMatch[0][0] === '/' ? 'regex' : 'string'} while stripping includes: ${includesMatch[0]}`);
 
@@ -293,9 +291,7 @@ const pageCompiler = module.exports = {
 
 				file.text = regex.stringReplace ? regex.stringReplace(file.text) : file.text.replace(regex, '');
 			});
-		}
-
-		[this.atImportRegex, this.importRegex, this.requireRegex, this.includeRegex].forEach(stripIncludes);
+		});
 
 		includes = Object.keys(includes);
 
