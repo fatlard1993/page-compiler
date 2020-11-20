@@ -2,9 +2,12 @@ class StringAwareRegExp extends RegExp {
 	static get [Symbol.species]() { return RegExp; }
 
 	constructor(regex, flags){
-		if(regex instanceof RegExp) regex = StringAwareRegExp.prototype.regExpToInnerRegexString(regex);
+		if(regex instanceof RegExp){
+			flags = flags || regex.flags;
+			regex = regex.source;
+		}
 
-		regex = super(`${StringAwareRegExp.prototype.disqualifyStringsRegExp}(${regex})`, flags);
+		regex = super(`${/\\\/|\/\s*(?:\\\/|[^\/\*\n])+\/|\\"|"(?:\\"|[^"])*"|\\'|'(?:\\'|[^'])*'|\\`|`(?:\\`|[^`])*`|/.source}(${regex})`, flags);
 
 		return regex;
 	}
@@ -14,16 +17,12 @@ class StringAwareRegExp extends RegExp {
 	}
 }
 
-StringAwareRegExp.prototype.regExpToInnerRegexString = function(regExp){ return regExp.toString().replace(/^\/|\/[gimsuy]*$/g, ''); };
-Object.defineProperty(StringAwareRegExp.prototype, 'disqualifyStringsRegExp', {
-	get: function(){
-		return StringAwareRegExp.prototype.regExpToInnerRegexString(/\\\/|\/\s*(?:\\\/|[^\/\*\n])+\/|\\"|"(?:\\"|[^"])*"|\\'|'(?:\\'|[^'])*'|\\`|`(?:\\`|[^`])*`|/);
-	}
-});
-
 class CommentRegExp extends StringAwareRegExp {
 	constructor(regex, flags){
-		if(regex instanceof RegExp) regex = StringAwareRegExp.prototype.regExpToInnerRegexString(regex);
+		if(regex instanceof RegExp){
+			flags = flags || regex.flags;
+			regex = regex.source;
+		}
 
 		return super(`\\/\\/${regex}$|(?:<!--|\\/\\s*\\*)\\s*${regex}\\s*(?:-->|\\*\\s*\\/)`, flags);
 	}
@@ -31,7 +30,10 @@ class CommentRegExp extends StringAwareRegExp {
 
 class StatementRegExp extends StringAwareRegExp {
 	constructor(regex, flags){
-		if(regex instanceof RegExp) regex = StringAwareRegExp.prototype.regExpToInnerRegexString(regex);
+		if(regex instanceof RegExp){
+			flags = flags || regex.flags;
+			regex = regex.source;
+		}
 
 		return super(`${regex}\\s*;?\\s*?`, flags);
 	}
