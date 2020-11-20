@@ -20,14 +20,14 @@ require('string.prototype.matchall').shim();
 
 const pageCompiler = module.exports = {
 	fileRegex: /^(\/?.+\/)?(.+)(?:\.(.+))$/,
-	moduleExportsRegex: /^\s*module\.exports.*$|module\.exports\s*=\s*/gm,
-	allCommentsRegex: new CommentRegExp(/[\s\S]*?/, 'gm'),
-	enableBabelRegex: new CommentRegExp(/enable-?_?\s?babel/, 'gmi'),
-	disableBabelRegex: new CommentRegExp(/disable-?_?\s?babel/, 'gmi'),
-	includeRegex: new CommentRegExp(/\s*(?:includes?|imports?|requires?)\s+(.+?)/, 'gm'),
-	importRegex: new StatementRegExp(/import\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+})\s+from)?\s*['"`](.+?)['"`]/, 'gm'),
-	requireRegex: new StatementRegExp(/(?:var|let|const)\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+}))\s*=\s*require\s*\(\s*['"`](.+?)['"`]\s*\)/, 'gm'),
-	atImportRegex: new StatementRegExp(/@import\s*['"`](.+?)['"`]/, 'gm'),
+	allCommentsRegex: new CommentRegExp(/[\s\S]*?/gm),
+	enableBabelRegex: new CommentRegExp(/enable-?_?\s?babel/gmi),
+	disableBabelRegex: new CommentRegExp(/disable-?_?\s?babel/gmi),
+	includeRegex: new CommentRegExp(/\s*(?:includes?|imports?|requires?)\s+(.+?)/gm),
+	importRegex: new StatementRegExp(/import\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+})\s+from)?\s*['"`](.+?)['"`]/gm),
+	requireRegex: new StatementRegExp(/(?:var|let|const)\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+}))\s*=\s*require\s*\(\s*['"`](.+?)['"`]\s*\)/gm),
+	atImportRegex: new StatementRegExp(/@import\s*['"`](.+?)['"`]/gm),
+	moduleExportsRegex: new StatementRegExp(/^(?:[^=]+|\s*)module\.exports.*$|module\.exports\s*=\s*/gm),
 	importSeparatorRegex: /['"`]\s*,\s*['"`]|\s*,\s*|\s+/g,
 	startText: '<!DOCTYPE html>\n<html lang="en"><head>\n',
 	openText: '\n</head><body>\n',
@@ -228,7 +228,7 @@ const pageCompiler = module.exports = {
 
 			const runBabel = (!fileLocation.includes('node_modules') || this.enableBabelRegex.test(fileText)) && !this.disableBabelRegex.test(fileText);
 
-			fileText = fileText.replace(this.moduleExportsRegex, '');
+			fileText = this.moduleExportsRegex.stringReplace(fileText);
 			fileText = this.enableBabelRegex.stringReplace(fileText);
 			fileText = this.disableBabelRegex.stringReplace(fileText);
 
