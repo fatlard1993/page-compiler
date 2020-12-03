@@ -341,11 +341,13 @@ const pageCompiler = module.exports = {
 			`../../node_modules/${location}/${name}.${extension}`,
 		] : [
 			`client/${extension}/${name}.${extension}`,
+			`src/client/${extension}/${name}.${extension}`,
 			`src/${name}.${extension}`,
 			`node_modules/${name}/src/index.${extension}`,
 			`node_modules/${name}/${extension}/${name}.${extension}`,
 			`node_modules/${name}/package.json`,
 			`client/resources/${name}.${extension}`,
+			`src/client/resources/${name}.${extension}`,
 			`../node_modules/${name}/src/index.${extension}`,
 			`../node_modules/${name}/${extension}/${name}.${extension}`,
 			`../node_modules/${name}/package.json`,
