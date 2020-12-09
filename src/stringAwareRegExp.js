@@ -7,7 +7,7 @@ class StringAwareRegExp extends RegExp {
 			regex = regex.source;
 		}
 
-		regex = super(`${/\\\/|\/\s*(?:\\\/|[^\/\*\n])+\/|\\"|"(?:\\"|[^"])*"|\\'|'(?:\\'|[^'])*'|\\`|`(?:\\`|[^`])*`|/.source}(${regex})`, flags);
+		regex = super(`${/\/.+\/\.|\s*[=(]\s*\/.+\/|\\"|"(?:\\"|[^"])*"|\\'|'(?:\\'|[^'])*'|\\`|`(?:\\`|[^`])*`|/.source}(${regex})`, flags);
 
 		return regex;
 	}
