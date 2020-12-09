@@ -102,6 +102,12 @@ const pageCompiler = module.exports = {
 				continue;
 			}
 
+			else if(pageCompiler.cache[files[x]] === undefined || pageCompiler.cache[files[x]] === 'undefined'){
+				log.warn(`Bad file cache: ${files[x]}`);
+
+				continue;
+			}
+
 			file[pageCompiler.cache[files[x]].extension] += `\n${pageCompiler.cache[files[x]].text}`;
 		}
 
