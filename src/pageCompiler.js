@@ -56,8 +56,8 @@ const pageCompiler = module.exports = {
 
 		if(!opts.postcssPlugins){
 			opts.postcssPlugins = [
-				postcssMixins(),
 				postcssSimpleVars(),
+				postcssMixins(),
 				postcssNested(),
 				postcssDarkThemeClass(),
 				postcssAutoprefixer({
