@@ -27,7 +27,6 @@ const pageCompiler = module.exports = {
 	importRegex: new StatementRegExp(/import\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+})\s+from)?\s*['"`](.+?)['"`]/gm),
 	requireRegex: new StatementRegExp(/(?:var|let|const)\s+(?:(?:\w+|{(?:\s*\w\s*,?\s*)+}))\s*=\s*require\s*\(\s*['"`](.+?)['"`]\s*\)/gm),
 	atImportRegex: new StatementRegExp(/@import\s*['"`](.+?)['"`]/gm),
-	moduleExportsRegex: new StatementRegExp(/^(?:[^=]+|\s*)module\.exports.*$|module\.exports\s*=\s*/gm),
 	importSeparatorRegex: /['"`]\s*,\s*['"`]|\s*,\s*|\s+/g,
 	startText: '<!DOCTYPE html>\n<html lang="en"><head>\n',
 	openText: '\n</head><body>\n',
@@ -234,7 +233,6 @@ const pageCompiler = module.exports = {
 
 			const runBabel = (!fileLocation.includes('node_modules') || this.enableBabelRegex.test(fileText)) && !this.disableBabelRegex.test(fileText);
 
-			fileText = this.moduleExportsRegex.stringReplace(fileText);
 			fileText = this.enableBabelRegex.stringReplace(fileText);
 			fileText = this.disableBabelRegex.stringReplace(fileText);
 
@@ -289,7 +287,7 @@ const pageCompiler = module.exports = {
 			[...file.text.matchAll(regex)].forEach((includesMatch) => {
 				if(includesMatch[1] === undefined) return log(4)(`Skipping ${includesMatch[0][0] === '/' ? 'regex' : 'string'} while stripping includes: ${includesMatch[0]}`);
 
-				log.info(1)(`Found includes statement: ${includesMatch[0]}`);
+				log.info(2)('Found includes statement .. ', includesMatch[0]);
 
 				file.includesText += includesMatch[0];
 
@@ -303,7 +301,7 @@ const pageCompiler = module.exports = {
 
 		if(!includes.length) return;
 
-		log(1)('Requested includes: ', includes);
+		log(2)('Requested includes .. ', includes);
 
 		var parsedIncludes = [];
 
@@ -337,7 +335,7 @@ const pageCompiler = module.exports = {
 
 		if(!filePath) filePath = this.opts.rootFolder;
 
-		log(1)(`Finding file: "${name}.${extension}" from: ${filePath}`);
+		log(2)(`Finding ${extension} file .. `, name, 'from .. ', filePath);
 
 		var fileLocation;
 		var checks = location ? [
@@ -374,7 +372,7 @@ const pageCompiler = module.exports = {
 			}
 
 			if(fs.existsSync(fileLocation)){
-				log.info(3)(`${fileLocation} exists`);
+				log.info(2)('Found', name, '..', fileLocation);
 
 				if(fileLocation.includes('package.json')){
 					var pkg = JSON.parse(fs.readFileSync(fileLocation));
@@ -390,7 +388,7 @@ const pageCompiler = module.exports = {
 			}
 
 			else{
-				log.warn(2)(`${fileLocation} does not exist`);
+				log.warn(3)(`${fileLocation} does not exist`);
 
 				fileLocation = null;
 			}
