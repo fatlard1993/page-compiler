@@ -279,6 +279,8 @@ const pageCompiler = module.exports = {
 	parseIncludes: function(file){
 		if(!file.text) return;
 
+		log.info(2)('Parsing includes for', file.location);
+
 		let includes = {};
 
 		file.includesText = '';
@@ -322,6 +324,8 @@ const pageCompiler = module.exports = {
 		file.includes = parsedIncludes;
 	},
 	findFile: function(name, extension, parentFile, location){
+		log(1)('Finding file ..', name, extension, parentFile && parentFile.path, location);
+
 		var filePath;
 
 		if(parentFile && parentFile.path){
@@ -344,6 +348,7 @@ const pageCompiler = module.exports = {
 			`../node_modules/${location}/${name}.${extension}`,
 			`../../node_modules/${location}/${name}.${extension}`,
 		] : [
+			`${parentFile ? parentFile.path : filePath}/${name}.${extension}`,
 			`client/${extension}/${name}.${extension}`,
 			`src/client/${extension}/${name}.${extension}`,
 			`src/${name}.${extension}`,
@@ -394,7 +399,7 @@ const pageCompiler = module.exports = {
 			}
 		}
 
-		if(!fileLocation && !this.prebuilt[name]) log.warn(`Could not find "${name}.${extension}" to include in "${parentFile ? parentFile.location : name}" - does not exist`);
+		if(!fileLocation && !this.prebuilt[name]) log.warn(`Could not find "${name}.${extension}" to include in "${filePath}" - does not exist`);
 
 		return fileLocation || (this.prebuilt[name] ? `prebuilt/${name}.${extension}` : '');
 	}
