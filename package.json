@@ -47,7 +47,7 @@
 		"performance-now": "^2.1.0",
 		"postcss": "^8.1.3",
 		"postcss-dark-theme-class": "^0.5.1",
-		"postcss-mixins": "^7.0.1",
+		"postcss-mixins": "github:fatlard1993/postcss-mixins#globbyFix",
 		"postcss-nested": "^5.0.1",
 		"postcss-simple-vars": "^6.0.1",
 		"string.prototype.matchall": "^4.0.2",
