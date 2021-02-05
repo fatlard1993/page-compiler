@@ -28,7 +28,8 @@
 		"ava": "^3.13.0",
 		"babel-eslint": "^10.1.0",
 		"eslint": "^7.11.0",
-		"eslint-config-rules": "github:fatlard1993/eslint-config-rules#2.x.x"
+		"eslint-config-rules": "github:fatlard1993/eslint-config-rules#2.x.x",
+		"yargs": "^16.1.0"
 	},
 	"ava": {
 		"files": [
@@ -50,7 +51,6 @@
 		"postcss-mixins": "github:fatlard1993/postcss-mixins#globbyFix",
 		"postcss-nested": "^5.0.1",
 		"postcss-simple-vars": "^6.0.1",
-		"string.prototype.matchall": "^4.0.2",
-		"yargs": "^16.1.0"
+		"string.prototype.matchall": "^4.0.2"
 	}
 }
