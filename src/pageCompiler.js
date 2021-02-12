@@ -14,7 +14,7 @@ const fsExtended = require('fs-extended');
 const log = new (require('log'))({ tag: 'page-compiler' });
 const util = require('js-util');
 
-const { StringAwareRegExp, CommentRegExp, StatementRegExp } = require('./stringAwareRegExp');
+const { CommentRegExp, StatementRegExp } = require('./stringAwareRegExp');
 
 require('string.prototype.matchall').shim();
 
@@ -137,7 +137,7 @@ const pageCompiler = module.exports = {
 				const dynamicReplacements = Object.keys(dynamicContent);
 
 				dynamicReplacements.forEach((replacement) => {
-					const args = dynamicContent[replacement], argsIsArray = regexArgs instanceof Array, regex = argsIsArray ? args[0] : args, flags = argsIsArray ? args[1] : 'gm';
+					const args = dynamicContent[replacement], argsIsArray = args instanceof Array, regex = argsIsArray ? args[0] : args, flags = argsIsArray ? args[1] : 'gm';
 
 					file.html = file.html.replace(new RegExp(regex, flags), replacement);
 				});
@@ -262,7 +262,7 @@ const pageCompiler = module.exports = {
 				}
 
 				catch(err){
-					log.error('Error running babel on JS: ', file, err);
+					log.error('Error running babel on JS: ', this.cache[fileLocation], err);
 				}
 			}
 
