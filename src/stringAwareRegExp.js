@@ -24,7 +24,9 @@ class CommentRegExp extends StringAwareRegExp {
 			regex = regex.source;
 		}
 
-		return super(`\\/\\/${regex}$|(?:<!--|\\/\\s*\\*)\\s*${regex}\\s*(?:-->|\\*\\s*\\/)`, flags);
+		regex = super(`\\/\\/${regex}$|(?:<!--|\\/\\s*\\*)\\s*${regex}\\s*(?:-->|\\*\\s*\\/)`, flags);
+
+		return regex;
 	}
 }
 
@@ -35,7 +37,9 @@ class StatementRegExp extends StringAwareRegExp {
 			regex = regex.source;
 		}
 
-		return super(`${regex}\\s*;?\\s*?`, flags);
+		regex = super(`${regex}\\s*;?\\s*?`, flags);
+
+		return regex;
 	}
 }
 
