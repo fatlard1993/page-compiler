@@ -21,14 +21,9 @@
 		"> 1%",
 		"not dead"
 	],
-	"eslintConfig": {
-		"extends": "rules"
-	},
 	"devDependencies": {
 		"ava": "^3.15.0",
-		"babel-eslint": "^10.1.0",
 		"eslint": "^7.19.0",
-		"eslint-config-rules": "github:fatlard1993/eslint-config-rules#2.x.x",
 		"yargs": "^16.2.0"
 	},
 	"ava": {
